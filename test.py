@@ -38,3 +38,4 @@ if __name__ == '__main__':
         all_GTs.append(extracted.to_frame(name=header))
     all_GTs= pd.DataFrame(all_GTs)
     print(all_GTs)
+    print("dont forget to delete me")
