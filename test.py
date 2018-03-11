@@ -1,12 +1,11 @@
-import sklearn
 import io
 import os
 import numpy as np
 import pandas as pd
-from sklearn.metrics import confusion_matrix
-from sklearn.model_selection import KFold, cross_val_score, cross_val_predict
 from sklearn import tree
-
+from sklearn.metrics import confusion_matrix
+from sklearn.model_selection import KFold
+import pickle
 
 # from sklearn.model_selection import KFold, cross_val_score, cross_val_predict
 
@@ -38,7 +37,8 @@ if __name__ == '__main__':
     # new_series = pd.DataFrame(classification)
 
     # data = read_vcf("test_sample.vcf")
-    data = read_vcf("CAGI_exome_hg19.gatk_reworked.vcf")
+    # data = read_vcf("CAGI_exome_hg19.gatk_reworked.vcf")
+    data = pickle.load(open("vcf_original_only_PASS_SNPs.vcf", "rb"))
     headers = ["CAGI2012_CD_01", "CAGI2012_CD_02", "CAGI2012_CD_03", "CAGI2012_CD_04", "CAGI2012_CD_05",
                "CAGI2012_CD_06", "CAGI2012_CD_07", "CAGI2012_CD_08", "CAGI2012_CD_09", "CAGI2012_CD_10",
                "CAGI2012_CD_11", "CAGI2012_CD_12", "CAGI2012_CD_13", "CAGI2012_CD_14", "CAGI2012_CD_15",
@@ -66,6 +66,8 @@ if __name__ == '__main__':
     all_GTs =all_GTs.applymap(convert_to_int)
     all_GTs_array= all_GTs.values
     all_GTs_array=all_GTs_array.astype(int)
+    # pickle.dump(all_GTs_array, open('vcf_original_only_PASS_SNPs_only_GTs', 'wb'))
+
     # all_GTs_array =np.array(all_GTs)
     kf = KFold(n_splits=4)
     clf_tree = tree.DecisionTreeClassifier(criterion="entropy")
