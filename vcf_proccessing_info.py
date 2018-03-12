@@ -39,21 +39,11 @@ headers = ["CAGI2012_CD_01", "CAGI2012_CD_02", "CAGI2012_CD_03", "CAGI2012_CD_04
 if __name__ == "__main__":
     # data = read_vcf("CAGI_exome_hg19.gatk_reworked.vcf")
     # data = read_vcf("vcf_original_only_PASS_SNPs")
-    # data = read_vcf("test_sample.vcf")
-    all_GTs_array = pickle.load(open("vcf_original_only_PASS_SNPs.vcf", "rb"))
-    all_GTs_array['QUAL'] = all_GTs_array['QUAL'].astype(float)
-    # all_GTs_array["QUAL"] =all_GTs_array["QUAL"].to_numeric(all_GTs_array["QUAL"], unit='int')
-    all_GTs_array.drop(all_GTs_array[all_GTs_array.QUAL < 15000].index, inplace=True)
-    all_GTs_array = all_GTs_array.astype(str)
-    all_GTs_array = all_GTs_array[~all_GTs_array[all_GTs_array == "./."].any(axis=1)]
-    pickle.dump(all_GTs_array, open('vcf_original_only_PASS_SNPs_QUAL15000_no_NULL', 'wb'))
-    # df[~(df < 0.5).all(1)]
-    # data_df = pd.DataFrame(data, columns=headers)
-    # table = data.values
-    # table2 = table[table[:,6]=='PASS']
-    # for index, row in data.iterrows():
-    #     if row['FILTER'] != 'PASS':
-    #         data.drop(index, inplace=True)
+    df = read_vcf("test_sample.vcf")
+    # df = pickle.load(open("test_sample.vcf", "rb"))
+    df = pd.DataFrame(df.row.str.split(' ', 1).tolist(),
+                      columns=['flips', 'row'])
+
 
     all_GTs = []
     for header in headers:

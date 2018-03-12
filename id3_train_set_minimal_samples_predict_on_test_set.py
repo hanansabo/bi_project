@@ -40,27 +40,29 @@ if __name__ == '__main__':
     all_GTs_train = all_GTs_array[0:49].copy()
     all_GTs_test = all_GTs_array[49:66].copy()
     # all_GTs_array =np.array(all_GTs)
-    kf = KFold(n_splits=4)
+    # kf = KFold(n_splits=4)
 
-    for i in range(2, 11):
-        score_j=0
-        print("Results for id3_with_test_set_minimal_samples_split={}".format(i))
-        for j in range(0, 10):
-            clf_tree = tree.DecisionTreeClassifier(criterion="entropy", min_samples_split=i)
-            score = 0
-            total_conf_mat = np.zeros((2, 2))
-            for train, test in kf.split(all_GTs_train):
-                # test1=all_GTs_array[train, :]
-                # test2= classification[train]
-                clf_tree.fit(all_GTs_train[train, :], classification[train])
-                score += clf_tree.score(all_GTs_train[test, :], classification[test])
-                y_pred = clf_tree.predict(all_GTs_train[test, :])
-                conf_mat = confusion_matrix(classification[test], y_pred)
-            avg_score = score / 4
-            score_j+=avg_score
+    # for i in range(2, 11):
+    # score_j = 0
+    i = 4
+    score = 0
+    conf_mat = np.zeros((2, 2))
+    print("Results for id3_with_test_set_minimal_samples_split={}".format(i))
+    for j in range(0, 100):
+        clf_tree = tree.DecisionTreeClassifier(criterion="entropy", min_samples_split=i)
+        clf_tree.fit(all_GTs_train, classification[0:49])
+        score += clf_tree.score(all_GTs_test, classification[49:66])
+        y_pred = clf_tree.predict(all_GTs_test)
+        conf_mat = conf_mat + confusion_matrix(classification[49:66], y_pred)
+        # for train, test in kf.split(all_GTs_train):
+        #     clf_tree.fit(all_GTs_train[train, :], classification[train])
+        #     score += clf_tree.score(all_GTs_train[test, :], classification[test])
+        # avg_score = score / 4
+        # score_j += avg_score
 
-            # print(conf_mat)
-            # total_conf_mat += conf_mat
-        print(score_j/10)
-        # print(total_conf_mat)
-        # print(all_GTs)
+    print("Confusion matrix:\n{}".format(conf_mat))
+    print("Confusion matrix:\n{}".format(conf_mat*100/1700))
+    # total_conf_mat += conf_mat
+    print(score / 100)
+    # print(total_conf_mat)
+    # print(all_GTs)
