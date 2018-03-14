@@ -43,7 +43,7 @@ if __name__ == '__main__':
     kf = KFold(n_splits=4)
 
     for i in range(2, 11):
-        score_j=0
+        score_j = 0
         print("Results for id3_with_test_set_minimal_samples_split={}".format(i))
         for j in range(0, 10):
             clf_tree = tree.DecisionTreeClassifier(criterion="entropy", min_samples_split=i)
@@ -57,10 +57,10 @@ if __name__ == '__main__':
                 y_pred = clf_tree.predict(all_GTs_train[test, :])
                 conf_mat = confusion_matrix(classification[test], y_pred)
             avg_score = score / 4
-            score_j+=avg_score
+            score_j += avg_score
 
             # print(conf_mat)
             # total_conf_mat += conf_mat
-        print(score_j/10)
+        print(score_j / 10)
         # print(total_conf_mat)
         # print(all_GTs)

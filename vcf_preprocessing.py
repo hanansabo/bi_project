@@ -6,7 +6,8 @@ from sklearn import tree
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import KFold
 import pickle
-
+from random import choices, sample
+import copy
 
 def read_vcf(path):
     with open(path, 'r') as f:
@@ -17,9 +18,25 @@ def read_vcf(path):
                'QUAL': str, 'FILTER': str, 'INFO': str}
     ).rename(columns={'#CHROM': 'CHROM'})
 
+
 def convert_to_int(word):
     new_value = ''.join(str(ord(c)) for c in word)
     return word.replace(word, new_value)
+
+
+def create_bootstrip_indexing(num_of_samples, train_set_size, test_set_size):
+    indexes = range(num_of_samples)
+    indexes = np.array(indexes)
+    new_indexes = choices(indexes, k=train_set_size)
+    match = []
+
+    while len(match) < test_set_size:
+        x = sample(range(num_of_samples), 1)
+        if x not in new_indexes:
+            match.append(x[0])
+    res = new_indexes + match
+    return copy.deepcopy(res)
+
 
 headers = ["CAGI2012_CD_01", "CAGI2012_CD_02", "CAGI2012_CD_03", "CAGI2012_CD_04", "CAGI2012_CD_05",
            "CAGI2012_CD_06", "CAGI2012_CD_07", "CAGI2012_CD_08", "CAGI2012_CD_09", "CAGI2012_CD_10",
@@ -37,16 +54,25 @@ headers = ["CAGI2012_CD_01", "CAGI2012_CD_02", "CAGI2012_CD_03", "CAGI2012_CD_04
            "CAGI2012_CD_66"]
 
 if __name__ == "__main__":
+    vec = create_bootstrip_indexing(66, 49, 17)
+    # print(indexes)
+    # indexes=np.array(indexes)
+    # new_indexes = choices(indexes,k=66)
+    # headers = np.array(headers)
+    # new_headers = headers[new_indexes]
+    # for i in range(10):
+    #     print(choices(indexes,k=66))
+
     # data = read_vcf("CAGI_exome_hg19.gatk_reworked.vcf")
     # data = read_vcf("vcf_original_only_PASS_SNPs")
     # data = read_vcf("test_sample.vcf")
-    all_GTs_array = pickle.load(open("vcf_original_only_PASS_SNPs.vcf", "rb"))
-    all_GTs_array['QUAL'] = all_GTs_array['QUAL'].astype(float)
-    # all_GTs_array["QUAL"] =all_GTs_array["QUAL"].to_numeric(all_GTs_array["QUAL"], unit='int')
-    all_GTs_array.drop(all_GTs_array[all_GTs_array.QUAL < 15000].index, inplace=True)
-    all_GTs_array = all_GTs_array.astype(str)
-    all_GTs_array = all_GTs_array[~all_GTs_array[all_GTs_array == "./."].any(axis=1)]
-    pickle.dump(all_GTs_array, open('vcf_original_only_PASS_SNPs_QUAL15000_no_NULL', 'wb'))
+    all_GTs_array = pickle.load(open("all_GTs_array.p", "rb"))
+    # all_GTs_array['QUAL'] = all_GTs_array['QUAL'].astype(float)
+    # # all_GTs_array["QUAL"] =all_GTs_array["QUAL"].to_numeric(all_GTs_array["QUAL"], unit='int')
+    # all_GTs_array.drop(all_GTs_array[all_GTs_array.QUAL < 15000].index, inplace=True)
+    # all_GTs_array = all_GTs_array.astype(str)
+    # all_GTs_array = all_GTs_array[~all_GTs_array[all_GTs_array == "./."].any(axis=1)]
+    # pickle.dump(all_GTs_array, open('vcf_original_only_PASS_SNPs_QUAL15000_no_NULL', 'wb'))
     # df[~(df < 0.5).all(1)]
     # data_df = pd.DataFrame(data, columns=headers)
     # table = data.values
@@ -69,4 +95,3 @@ if __name__ == "__main__":
     all_GTs_array = all_GTs.values
     all_GTs_array = all_GTs_array.astype(int)
     pickle.dump(all_GTs_array, open('vcf_original_only_PASS_SNPs_QUAL15000_no_NULL.p', 'wb'))
-

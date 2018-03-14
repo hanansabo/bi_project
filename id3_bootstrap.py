@@ -1,3 +1,5 @@
+from random import choices
+
 import sklearn
 import io
 import os
@@ -7,7 +9,8 @@ from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import KFold, cross_val_score, cross_val_predict
 from sklearn import tree
 import pickle
-
+from random import choices, sample
+import copy
 
 # from sklearn.model_selection import KFold, cross_val_score, cross_val_predict
 
@@ -26,6 +29,20 @@ def read_vcf(path):
     ).rename(columns={'#CHROM': 'CHROM'})
 
 
+def create_bootstrip_indexing(num_of_samples, train_set_size, test_set_size):
+    indexes = range(num_of_samples)
+    indexes = np.array(indexes)
+    new_indexes = choices(indexes, k=train_set_size)
+    match = []
+
+    while len(match) < test_set_size:
+        x = sample(range(num_of_samples), 1)
+        if x not in new_indexes:
+            match.append(x[0])
+    res = new_indexes + match
+    return copy.deepcopy(res)
+
+
 if __name__ == '__main__':
 
     classification = ["TRUE", "TRUE", "TRUE", "TRUE", "TRUE", "FALSE", "TRUE", "FALSE", "TRUE", "TRUE", "TRUE", "TRUE",
@@ -42,8 +59,7 @@ if __name__ == '__main__':
     # print("162610: {}".format(all_GTs_array_2.ix[162610]))
     # print("201004: {}".format(all_GTs_array_2.ix[201004]))
     # print("165433: {}".format(all_GTs_array_2.ix[165433]))
-    all_GTs_train = all_GTs_array[0:49].copy()
-    all_GTs_test = all_GTs_array[49:66].copy()
+
     # all_GTs_array =np.array(all_GTs)
     # kf = KFold(n_splits=4)
 
@@ -52,13 +68,23 @@ if __name__ == '__main__':
     i = 4
     score = 0
     conf_mat = np.zeros((2, 2))
+    bootstrip_n = 10
+    k_parameters_vector = np.zeros(bootstrip_n)
+    indexes = range(66)
     print("Results for id3_with_test_set_minimal_samples_split={}".format(i))
-    for j in range(1):
+    for j in range(bootstrip_n):
+        new_indexes = choices(indexes, k=66)
+        resampled_data = all_GTs_array[new_indexes]
+        all_GTs_train = resampled_data[0:49].copy()
+        all_GTs_test = resampled_data[49:66].copy()
+        new_classification = classification[new_indexes]
         clf_tree = tree.DecisionTreeClassifier(criterion="entropy", min_samples_split=i)
-        clf_tree.fit(all_GTs_train, classification[0:49])
-        score += clf_tree.score(all_GTs_test, classification[49:66])
+        clf_tree.fit(all_GTs_train, new_classification[0:49])
+        # score += clf_tree.score(all_GTs_test, classification[49:66])
+        print(clf_tree.score(all_GTs_test, new_classification[49:66]))
         y_pred = clf_tree.predict(all_GTs_test)
-        conf_mat = conf_mat + confusion_matrix(classification[49:66], y_pred)
+
+        # conf_mat = conf_mat + confusion_matrix(classification[49:66], y_pred)
         # tree.export_graphviz(clf_tree, out_file='tree.dot')
         # for train, test in kf.split(all_GTs_train):
         #     clf_tree.fit(all_GTs_train[train, :], classification[train])

@@ -35,7 +35,7 @@ if __name__ == '__main__':
                       "FALSE", "TRUE", "TRUE", "TRUE", "TRUE", "TRUE", "FALSE", "TRUE", "TRUE", "TRUE", "TRUE", "TRUE",
                       "TRUE", "FALSE", "FALSE", "TRUE", "TRUE", "FALSE"]
     classification = np.array(classification)
-    FILES = ['vcf_original_only_PASS_SNPs_only_GTs.p', 'vcf_original_only_PASS_SNPs_QUAL1000_no_NULL.p',
+    FILES = ['vcf_original_only_PASS_SNPs_only_GTs', 'vcf_original_only_PASS_SNPs_QUAL1000_no_NULL.p',
              'vcf_original_only_PASS_SNPs_QUAL10000_no_NULL.p', 'vcf_original_only_PASS_SNPs_QUAL15000_no_NULL.p',
              'vcf_original_only_PASS_SNPs_QUAL20000_no_NULL.p', 'vcf_original_only_PASS_SNPs_QUAL50000_no_NULL.p',
              'vcf_original_only_PASS_SNPs_QUAL100000_no_NULL.p']
